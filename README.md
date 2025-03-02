@@ -7,6 +7,7 @@ Welcome to my personal project that I created. I was playing a game called _Yu-G
 -   Loads a **.txt** file of your choice (in the correct format)
 -   Search bar to **add cards** from your deck or select specific cards to filter
 -   Filtered list **displays all possible fusions** based on the selected materials
+-   Has local storage which stores active filters
 
 ## Txt File Format
 
@@ -25,11 +26,17 @@ Fiend + Spellcaster = Dark Magician
 
 A file named **DM2-Fusion-List.txt** is included in the project, containing every fusion from _Yu-Gi-Oh! Duel Monsters II: Dark Duel Stories_. This serves as an example of the correct format.
 
-## How to Use
+## How to Use Dev
 
-1. **Upload a `.txt` file** in the correct format.
-2. **Use the search bar** to add cards to your filtered list.
-3. The app will **display all fusions** that can be created using the cards in your filtered list.
+1. npm i
+2. npm run dev
+3. **Upload a `.txt` file** in the correct format.
+4. **Use the search bar** to add cards to your filtered list.
+5. The app will **display all fusions** that can be created using the cards in your filtered list.
+
+## How to Use User (WIP)
+
+WIP
 
 ## Future Updates
 

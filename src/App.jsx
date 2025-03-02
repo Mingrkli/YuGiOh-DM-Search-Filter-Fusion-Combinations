@@ -1,12 +1,28 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 function App() {
     // States
     const [fusionFileData, setFusionFileData] = useState([]);
     const [searchTerm, setSearchTerm] = useState("");
-    const [filterList, setFilterList] = useState([]);
+    const [filterList, setFilterList] = useState(() => {
+        return JSON.parse(localStorage.getItem("filterList")) || [];
+    });
     const [selectedFile, setSelectedFile] = useState("");
     const [fusionResults, setFusionResults] = useState([]);
+
+    // Load filters from local storage when the app starts
+    useEffect(() => {
+        const savedFilters = JSON.parse(localStorage.getItem("filterList"));
+        if (savedFilters) {
+            setFilterList(savedFilters);
+            updateFusionResults(savedFilters);
+        }
+    }, []);
+
+    // Save filters to local storage when they change
+    useEffect(() => {
+        localStorage.setItem("filterList", JSON.stringify(filterList));
+    }, [filterList]);
 
     // Read and process an uploaded file
     const handleFileUpload = (event) => {
@@ -91,13 +107,20 @@ function App() {
         setFusionResults([...new Set(results)]); // Ensure unique results
     };
 
+    // Clear all filters
+    const clearFilters = () => {
+        setFilterList([]);
+        localStorage.removeItem("filterList");
+        setFusionResults([]);
+    };
+
     return (
-        <div>
+        <main>
             <h1>YuGiOh DM Search & Filter Fusion Combinations</h1>
 
             {/* File Upload */}
+
             <input type="file" onChange={handleFileUpload} />
-            <br />
 
             {selectedFile && (
                 <p>
@@ -118,13 +141,17 @@ function App() {
             {filterList.length > 0 && (
                 <div>
                     <h3>Active Filters:</h3>
+                    <button onClick={clearFilters}>Clear All</button>
                     <ul>
                         {filterList.map((item, index) => (
                             <li key={index}>
-                                {item}{" "}
-                                <button onClick={() => removeFilter(item)}>
+                                <button
+                                    className="remove-filter"
+                                    onClick={() => removeFilter(item)}
+                                >
                                     ❌
                                 </button>
+                                {item}{" "}
                             </li>
                         ))}
                     </ul>
@@ -159,7 +186,7 @@ function App() {
             ) : filterList.length > 0 ? (
                 <p>No results found.</p>
             ) : null}
-        </div>
+        </main>
     );
 }
 
