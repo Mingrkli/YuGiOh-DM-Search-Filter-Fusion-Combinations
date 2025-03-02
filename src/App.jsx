@@ -1,6 +1,7 @@
 import { useState } from "react";
 
 function App() {
+    // States
     const [fusionFileData, setFusionFileData] = useState([]);
     const [searchTerm, setSearchTerm] = useState("");
     const [filterList, setFilterList] = useState([]);
@@ -22,6 +23,7 @@ function App() {
     };
 
     // Process the file content
+    // Split each line break then each line will split into 3 parts, "material1 + material2 = result"
     const processFile = (fileContent) => {
         const parsedData = fileContent
             .split("\n")
@@ -44,6 +46,7 @@ function App() {
     };
 
     // Add search term to filter list
+    // Checks the searchTerm trim and lower case and will add it to the filtered list while will updateFusionResults
     const addFilter = () => {
         if (
             searchTerm.trim() &&
@@ -56,7 +59,7 @@ function App() {
         setSearchTerm("");
     };
 
-    // Remove a filter from the list
+    // Removes the item from the filter from the list then updateFusionResults
     const removeFilter = (item) => {
         const newFilters = filterList.filter((filter) => filter !== item);
         setFilterList(newFilters);
@@ -64,6 +67,7 @@ function App() {
     };
 
     // Apply filtering logic
+    // Basically means that it will filter the list if the fusion includes the material1 and material2 to show the user what fusions they can do
     const filteredFusions =
         filterList.length > 0
             ? fusionFileData.filter(
@@ -74,6 +78,7 @@ function App() {
             : [];
 
     // Update Fusion Results based on active filters
+    // Filters out the file data and show you fusions base on your materials you have
     const updateFusionResults = (filters) => {
         const results = fusionFileData
             .filter(
