@@ -6,8 +6,10 @@ Welcome to my personal project that I created. I was playing a game called _Yu-G
 
 -   Loads a **.txt** file of your choice (in the correct format)
 -   Search bar to **add cards** from your deck or select specific cards to filter
+-   When searching, it will show a **dropdown** for similar words in **.txt** file loaded
 -   Filtered list **displays all possible fusions** based on the selected materials
--   Has local storage which stores active filters
+-   Has local storage which **stores** active filters
+-   **Highlights** active filters not used
 
 ## Txt File Format
 
@@ -34,8 +36,13 @@ A file named **DM2-Fusion-List.txt** is included in the project, containing ever
 
 ## How to Use Dev
 
-1. npm i
-2. npm run dev
+```
+npm i
+```
+
+```
+npm run dev
+```
 
 ## Contributions
 

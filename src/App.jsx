@@ -9,6 +9,7 @@ function App() {
     });
     const [selectedFile, setSelectedFile] = useState("");
     const [fusionResults, setFusionResults] = useState([]);
+    const [suggestions, setSuggestions] = useState([]);
 
     // Load filters from local storage when the app starts
     useEffect(() => {
@@ -61,6 +62,22 @@ function App() {
         setFusionFileData(parsedData);
     };
 
+    // getAllMaterials to be ready for the drop down selection from the search bar
+    const getAllMaterials = () => {
+        const materials = new Set();
+        fusionFileData.forEach(({ material1, material2 }) => {
+            materials.add(material1.toLowerCase());
+            materials.add(material2.toLowerCase());
+        });
+        return Array.from(materials);
+    };
+
+    // If the user selectSuggestion from the dropdown
+    const selectSuggestion = (suggestion) => {
+        setSearchTerm(suggestion);
+        setSuggestions([]); // Hide suggestions when selected
+    };
+
     // Add search term to filter list
     // Checks the searchTerm trim and lower case and will add it to the filtered list while will updateFusionResults
     const addFilter = () => {
@@ -75,22 +92,31 @@ function App() {
         setSearchTerm("");
     };
 
-    // Removes the item from the filter from the list then updateFusionResults
-    const removeFilter = (item) => {
-        const newFilters = filterList.filter((filter) => filter !== item);
-        setFilterList(newFilters);
-        updateFusionResults(newFilters);
-    };
-
     // Apply filtering logic
     // Basically means that it will filter the list if the fusion includes the material1 and material2 to show the user what fusions they can do
     const filteredFusions =
         filterList.length > 0
-            ? fusionFileData.filter(
-                  (fusion) =>
-                      filterList.includes(fusion.material1.toLowerCase()) &&
-                      filterList.includes(fusion.material2.toLowerCase())
-              )
+            ? fusionFileData
+                  .filter(
+                      (fusion) =>
+                          filterList.includes(fusion.material1.toLowerCase()) &&
+                          filterList.includes(fusion.material2.toLowerCase())
+                  )
+                  .reduce((uniqueFusions, fusion) => {
+                      // Check if this fusion is already included (to prevent duplicates)
+                      // For example "Dancing Elf + Dancing Elf = Dark Witch"
+                      const exists = uniqueFusions.some(
+                          (f) =>
+                              (f.material1 === fusion.material1 &&
+                                  f.material2 === fusion.material2) ||
+                              (f.material1 === fusion.material2 &&
+                                  f.material2 === fusion.material1)
+                      );
+                      if (!exists) {
+                          uniqueFusions.push(fusion);
+                      }
+                      return uniqueFusions;
+                  }, [])
             : [];
 
     // Update Fusion Results based on active filters
@@ -107,6 +133,13 @@ function App() {
         setFusionResults([...new Set(results)]); // Ensure unique results
     };
 
+    // Removes the item from the filter from the list then updateFusionResults
+    const removeFilter = (item) => {
+        const newFilters = filterList.filter((filter) => filter !== item);
+        setFilterList(newFilters);
+        updateFusionResults(newFilters);
+    };
+
     // Clear all filters
     const clearFilters = () => {
         setFilterList([]);
@@ -114,6 +147,23 @@ function App() {
         setFusionResults([]);
     };
 
+    // handleSearchChange when the search bar has change when more than 3 letters
+    const handleSearchChange = (event) => {
+        const value = event.target.value;
+        setSearchTerm(value);
+
+        if (value.length >= 3) {
+            const allMaterials = getAllMaterials();
+            const filteredSuggestions = allMaterials.filter((material) =>
+                material.startsWith(value.toLowerCase())
+            );
+            setSuggestions(filteredSuggestions.slice(0, 10)); // Show max 10 suggestions
+        } else {
+            setSuggestions([]);
+        }
+    };
+
+    //
     return (
         <main>
             <h1>YuGiOh DM Search & Filter Fusion Combinations</h1>
@@ -135,12 +185,29 @@ function App() {
             )}
 
             {/* Search bar for adding multiple filters */}
-            <input
-                type="text"
-                placeholder="Add filter..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-            />
+            <div className="search-container">
+                <input
+                    type="text"
+                    placeholder="Add filter..."
+                    value={searchTerm}
+                    onChange={handleSearchChange}
+                />
+
+                {/* Dropdown Suggestions */}
+                {suggestions.length > 0 && (
+                    <ul className="suggestions">
+                        {suggestions.map((suggestion, index) => (
+                            <li
+                                key={index}
+                                onClick={() => selectSuggestion(suggestion)}
+                            >
+                                {suggestion}
+                            </li>
+                        ))}
+                    </ul>
+                )}
+            </div>
+
             <button onClick={addFilter}>Add</button>
 
             {/* Display selected filters */}
@@ -149,17 +216,29 @@ function App() {
                     <h3>Active Filters:</h3>
                     <button onClick={clearFilters}>Clear All</button>
                     <ul>
-                        {filterList.map((item, index) => (
-                            <li key={index}>
-                                <button
-                                    className="remove-filter"
-                                    onClick={() => removeFilter(item)}
+                        {filterList.map((item, index) => {
+                            // Check if the filter is actually used in filteredFusions
+                            const isUsed = filteredFusions.some(
+                                (fusion) =>
+                                    fusion.material1.toLowerCase() === item ||
+                                    fusion.material2.toLowerCase() === item
+                            );
+
+                            return (
+                                <li
+                                    key={index}
+                                    style={{ color: isUsed ? "white" : "red" }}
                                 >
-                                    ❌
-                                </button>
-                                {item}{" "}
-                            </li>
-                        ))}
+                                    <button
+                                        className="remove-filter"
+                                        onClick={() => removeFilter(item)}
+                                    >
+                                        ❌
+                                    </button>
+                                    {item}
+                                </li>
+                            );
+                        })}
                     </ul>
                 </div>
             )}
@@ -180,14 +259,24 @@ function App() {
             {filterList.length > 0 && filteredFusions.length > 0 ? (
                 <div>
                     <h3>Fusions:</h3>
-                    <ul>
-                        {filteredFusions.map((fusion, index) => (
-                            <li key={index}>
-                                {fusion.material1} + {fusion.material2} ={" "}
-                                {fusion.result}
-                            </li>
-                        ))}
-                    </ul>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Material 1</th>
+                                <th>Material 2</th>
+                                <th>Result</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {filteredFusions.map((fusion, index) => (
+                                <tr key={index}>
+                                    <td>{fusion.material1}</td>
+                                    <td>{fusion.material2}</td>
+                                    <td>{fusion.result}</td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
                 </div>
             ) : filterList.length > 0 ? (
                 <p>No results found.</p>

@@ -39,3 +39,62 @@ button {
 a {
     color: cyan;
 }
+
+/* Table for results of fusions */
+table {
+    margin-top: 10px;
+    width: 100%;
+
+    border-collapse: collapse;
+    text-align: center;
+}
+
+th,
+td {
+    border: 1px solid #ddd;
+    padding: 8px;
+}
+
+th {
+    color: white;
+    font-weight: bold;
+}
+
+tr:hover {
+    background-color: rgba(0, 0, 0, 0.5);
+}
+
+/* Search */
+.search-container {
+    position: relative;
+
+    width: 100%;
+}
+
+.search-container input {
+    width: 100%;
+}
+
+.suggestions {
+    position: absolute;
+
+    width: 100%;
+    max-height: 150px;
+
+    background: rgb(20, 20, 20);
+    border: 1px solid #ddd;
+    list-style: none;
+
+    overflow-y: auto;
+    z-index: 1000;
+}
+
+.suggestions li {
+    padding: 8px;
+    cursor: pointer;
+    transition: background 0.3s ease;
+}
+
+.suggestions li:hover {
+    background: #f2f2f2;
+}
