@@ -212,9 +212,11 @@ function App() {
 
             {/* Display selected filters */}
             {filterList.length > 0 && (
-                <div>
+                <div className="active-filters-container">
                     <h3>Active Filters:</h3>
-                    <button onClick={clearFilters}>Clear All</button>
+                    <button className="clear-all-btn" onClick={clearFilters}>
+                        Clear All
+                    </button>
                     <ul>
                         {filterList.map((item, index) => {
                             // Check if the filter is actually used in filteredFusions
