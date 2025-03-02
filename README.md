@@ -26,21 +26,16 @@ Fiend + Spellcaster = Dark Magician
 
 A file named **DM2-Fusion-List.txt** is included in the project, containing every fusion from _Yu-Gi-Oh! Duel Monsters II: Dark Duel Stories_. This serves as an example of the correct format.
 
+## How to Use User
+
+1. **Upload a `.txt` file** in the correct format.
+2. **Use the search bar** to add cards to your filtered list.
+3. The app will **display all fusions** that can be created using the cards in your filtered list.
+
 ## How to Use Dev
 
 1. npm i
 2. npm run dev
-3. **Upload a `.txt` file** in the correct format.
-4. **Use the search bar** to add cards to your filtered list.
-5. The app will **display all fusions** that can be created using the cards in your filtered list.
-
-## How to Use User (WIP)
-
-WIP
-
-## Future Updates
-
--   Plan to convert this into a **desktop app using Electron** to make it easier to use for non-developers.
 
 ## Contributions
 

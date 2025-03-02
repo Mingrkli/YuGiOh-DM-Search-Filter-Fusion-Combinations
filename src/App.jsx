@@ -117,6 +117,12 @@ function App() {
     return (
         <main>
             <h1>YuGiOh DM Search & Filter Fusion Combinations</h1>
+            <a
+                href="https://github.com/Mingrkli/YuGiOh-DM-Search-Filter-Fusion-Combinations"
+                target="_blank"
+            >
+                Link to Github Repo
+            </a>
 
             {/* File Upload */}
 

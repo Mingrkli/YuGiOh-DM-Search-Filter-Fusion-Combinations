@@ -35,3 +35,7 @@ button {
     background: transparent;
     border: transparent;
 }
+
+a {
+    color: cyan;
+}
