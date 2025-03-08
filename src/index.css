@@ -40,6 +40,21 @@ a {
     color: cyan;
 }
 
+.btn {
+    padding: 0.5rem 1rem;
+
+    background-color: rgb(0, 187, 187);
+    border: none;
+    border-radius: 20px;
+
+    transition: 200ms ease-in-out;
+}
+
+.btn:hover {
+    background-color: rgb(0, 255, 255);
+    box-shadow: 0 0 10px cyan;
+}
+
 /* Table for results of fusions 
 =========================================================== */
 table {
@@ -75,6 +90,14 @@ tr:hover {
 
 .search-container input {
     width: 100%;
+
+    border: none;
+    border-radius: 20px;
+}
+
+.search-container input:focus {
+    outline: none;
+    box-shadow: 0 0 10px cyan;
 }
 
 .suggestions {
@@ -112,5 +135,5 @@ tr:hover {
 }
 
 .clear-all-btn {
-    margin: 1rem 0;
+    margin-bottom: 1rem;
 }

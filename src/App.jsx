@@ -10,20 +10,35 @@ function App() {
     const [selectedFile, setSelectedFile] = useState("");
     const [fusionResults, setFusionResults] = useState([]);
     const [suggestions, setSuggestions] = useState([]);
+    const [ignoreList, setIgnoreList] = useState(() => {
+        return JSON.parse(localStorage.getItem("ignoreList")) || [];
+    });
 
-    // Load filters from local storage when the app starts
+    // Load filters and ignoreList from local storage when the app starts
     useEffect(() => {
         const savedFilters = JSON.parse(localStorage.getItem("filterList"));
+        const savedIgnoreList = JSON.parse(localStorage.getItem("ignoreList"));
+
         if (savedFilters) {
             setFilterList(savedFilters);
-            updateFusionResults(savedFilters);
+            updateFusionResults(savedFilters, savedIgnoreList || []);
+        }
+
+        if (savedIgnoreList) {
+            setIgnoreList(savedIgnoreList);
         }
     }, []);
 
-    // Save filters to local storage when they change
+    // Save filters to local storage when filterList is changed
     useEffect(() => {
         localStorage.setItem("filterList", JSON.stringify(filterList));
     }, [filterList]);
+
+    // save ignoreList to local storage when ignoreList is changed
+    useEffect(() => {
+        localStorage.setItem("ignoreList", JSON.stringify(ignoreList));
+        updateFusionResults(filterList, ignoreList);
+    }, [ignoreList]);
 
     // Read and process an uploaded file
     const handleFileUpload = (event) => {
@@ -121,16 +136,18 @@ function App() {
 
     // Update Fusion Results based on active filters
     // Filters out the file data and show you fusions base on your materials you have
-    const updateFusionResults = (filters) => {
+    // It now also exclude any ignored results
+    const updateFusionResults = (filters, ignored) => {
         const results = fusionFileData
             .filter(
                 (fusion) =>
                     filters.includes(fusion.material1.toLowerCase()) &&
-                    filters.includes(fusion.material2.toLowerCase())
+                    filters.includes(fusion.material2.toLowerCase()) &&
+                    !ignored.includes(fusion.result.toLowerCase())
             )
             .map((fusion) => fusion.result);
 
-        setFusionResults([...new Set(results)]); // Ensure unique results
+        setFusionResults([...new Set(results)]);
     };
 
     // Removes the item from the filter from the list then updateFusionResults
@@ -161,6 +178,22 @@ function App() {
         } else {
             setSuggestions([]);
         }
+    };
+
+    // Once user clicks on a row, it'll filter out the list without the selected ignored
+    const ignoreFusionResult = (result) => {
+        const lowerCaseResult = result.toLowerCase();
+        if (!ignoreList.includes(lowerCaseResult)) {
+            const newIgnoreList = [...ignoreList, lowerCaseResult];
+            setIgnoreList(newIgnoreList);
+            updateFusionResults(filterList, newIgnoreList); // Updates the fusion results
+        }
+    };
+
+    // removeIgnoredItem on selected item
+    const removeIgnoredItem = (item) => {
+        const newIgnoreList = ignoreList.filter((ignored) => ignored !== item);
+        setIgnoreList(newIgnoreList);
     };
 
     //
@@ -208,7 +241,9 @@ function App() {
                 )}
             </div>
 
-            <button onClick={addFilter}>Add</button>
+            <button className="btn" onClick={addFilter}>
+                Add
+            </button>
 
             {/* Display selected filters */}
             {filterList.length > 0 && (
@@ -219,17 +254,21 @@ function App() {
                     </button>
                     <ul>
                         {filterList.map((item, index) => {
-                            // Check if the filter is actually used in filteredFusions
+                            // Check if the filter is actually used in fusions that are still visible
                             const isUsed = filteredFusions.some(
                                 (fusion) =>
-                                    fusion.material1.toLowerCase() === item ||
-                                    fusion.material2.toLowerCase() === item
+                                    (fusion.material1.toLowerCase() === item ||
+                                        fusion.material2.toLowerCase() ===
+                                            item) &&
+                                    !ignoreList.includes(
+                                        fusion.result.toLowerCase()
+                                    ) // Ensure the fusion result is not ignored
                             );
 
                             return (
                                 <li
                                     key={index}
-                                    style={{ color: isUsed ? "white" : "red" }}
+                                    style={{ color: isUsed ? "white" : "red" }} // Change color if not used due to ignored results
                                 >
                                     <button
                                         className="remove-filter"
@@ -245,13 +284,20 @@ function App() {
                 </div>
             )}
 
-            {/* Display Fusion Results */}
-            {fusionResults.length > 0 && (
-                <div>
-                    <h3>Fusions you can make:</h3>
+            {ignoreList.length > 0 && (
+                <div className="active-filters-container">
+                    <h3>Ignored Results:</h3>
                     <ul>
-                        {fusionResults.map((result, index) => (
-                            <li key={index}>{result}</li>
+                        {ignoreList.map((item, index) => (
+                            <li key={index}>
+                                <button
+                                    className="remove-filter"
+                                    onClick={() => removeIgnoredItem(item)}
+                                >
+                                    ❌
+                                </button>
+                                {item}
+                            </li>
                         ))}
                     </ul>
                 </div>
@@ -270,13 +316,26 @@ function App() {
                             </tr>
                         </thead>
                         <tbody>
-                            {filteredFusions.map((fusion, index) => (
-                                <tr key={index}>
-                                    <td>{fusion.material1}</td>
-                                    <td>{fusion.material2}</td>
-                                    <td>{fusion.result}</td>
-                                </tr>
-                            ))}
+                            {filteredFusions
+                                .filter(
+                                    (fusion) =>
+                                        !ignoreList.includes(
+                                            fusion.result.toLowerCase()
+                                        )
+                                ) // Remove ignored results from display
+                                .map((fusion, index) => (
+                                    <tr
+                                        key={index}
+                                        onClick={() =>
+                                            ignoreFusionResult(fusion.result)
+                                        }
+                                        style={{ cursor: "pointer" }}
+                                    >
+                                        <td>{fusion.material1}</td>
+                                        <td>{fusion.material2}</td>
+                                        <td>{fusion.result}</td>
+                                    </tr>
+                                ))}
                         </tbody>
                     </table>
                 </div>
