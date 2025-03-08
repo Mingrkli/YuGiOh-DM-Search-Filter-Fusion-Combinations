@@ -10,6 +10,7 @@ Welcome to my personal project that I created. I was playing a game called _Yu-G
 -   Filtered list **displays all possible fusions** based on the selected materials
 -   Has local storage which **stores** active filters
 -   **Highlights** active filters not used
+-   Table rows can be selected to add to ignored list
 
 ## Txt File Format
 
